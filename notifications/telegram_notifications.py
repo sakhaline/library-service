@@ -2,7 +2,7 @@ import datetime
 import os
 
 import telegram
-from telegram import InlineKeyboardMarkup, InlineKeyboardButton, ParseMode
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
@@ -50,7 +50,9 @@ def borrowing_notification(
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
+                InlineKeyboardButton(
+                    text="🎫 THIS ORDER", url=ticket_url
+                ),
                 InlineKeyboardButton(
                     text="🎟️ ALL ORDERS", url=all_tickets_url
                 ),
@@ -84,7 +86,9 @@ def payment_notification(
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
+                InlineKeyboardButton(
+                    text="🎫 THIS ORDER", url=ticket_url
+                ),
                 InlineKeyboardButton(
                     text="🎟️ ALL ORDERS", url=all_tickets_url
                 ),

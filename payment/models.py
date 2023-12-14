@@ -1,5 +1,6 @@
-from django.db import models
 from enum import Enum
+
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from enumfields import EnumField
 
@@ -16,8 +17,9 @@ class Payment(models.Model):
     status = EnumField(
         StatusChoices, max_length=16, default=StatusChoices.PENDING
     )
-    payment_type = EnumField(TypeChoices, max_length=16,
-                        default=TypeChoices.PAYMENT)
+    payment_type = EnumField(
+        TypeChoices, max_length=16, default=TypeChoices.PAYMENT
+    )
     borrowing_id = models.IntegerField()
     session_url = models.CharField(max_length=255)
     session_id = models.CharField(max_length=255)
