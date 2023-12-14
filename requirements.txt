@@ -1,8 +1,13 @@
 asgiref==3.7.2
 black==23.12.0
+cffi==1.16.0
+cryptography==41.0.7
 Django==4.2
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
 pytz==2023.3.post1
+pycparser==2.21
+pyjwt==2.8.0
 pillow==10.1.0
 sqlparse==0.4.4
 flake8==6.1.0

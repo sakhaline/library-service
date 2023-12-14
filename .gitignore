@@ -259,6 +259,8 @@ fabric.properties
 !.idea/codeStyles
 !.idea/runConfigurations
 
+.idea/codeStyles/codeStyleConfig.xml
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 
