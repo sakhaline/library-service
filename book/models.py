@@ -4,8 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Book(models.Model):
     class Cover(models.TextChoices):
-        HARD = "hard", _("Hard cover")
-        SOFT = "soft", _("Soft cover")
+        HARD = "H", _("Hard cover")
+        SOFT = "S", _("Soft cover")
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     cover = models.CharField(max_length=4, choices=Cover, default=Cover.HARD)
