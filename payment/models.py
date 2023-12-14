@@ -7,7 +7,7 @@ from enumfields import EnumField
 class Payment(models.Model):
     class StatusChoices(Enum):
         PENDING = "P", _("Pending")
-        Paid = "P", _("Paid")
+        PAID = "P", _("Paid")
 
     class TypeChoices(Enum):
         PAYMENT = "P", _("Payment")
