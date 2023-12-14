@@ -19,35 +19,8 @@ PAYMENT_PHOTO = (
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
 
-def borrowing_notification(
-    user_first_name: str,
-    user_last_name: str,
-    books: list[str],
-    borrow_date: datetime,
-    expected_return_date: datetime,
-    ticket_id: int,
-    all_tickets_url: str,
-) -> None:
-    ticket_url = all_tickets_url + str(ticket_id) + "/"
-
-    context = f"<b>{user_first_name} {user_last_name}</b> borrowed"
-    if books:
-        book_list = "\n  ●  ".join(books)
-        context += (
-            f" {'a few books' if len(books) > 1 else 'a book'}:\n\n  "
-            f"●  {book_list}\n"
-        )
-    else:
-        context += " no books.\n"
-    context += (
-        f"\n<b>Borrow date:</b><code> "
-        f"{borrow_date.strftime('%d.%m.%Y')}</code>\n"
-        f"<b>Expected return date:</b><code>"
-        f" {expected_return_date.strftime('%d.%m.%Y')}</code>\n"
-        f"\nCreated<a href='{ticket_url}'> order {ticket_id}.</a>"
-    )
-
-    keyboard = InlineKeyboardMarkup(
+def __create_keyboard(ticket_url: str, all_tickets_url: str):
+    return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
@@ -57,6 +30,48 @@ def borrowing_notification(
             ],
         ]
     )
+
+
+def borrowing_notification(
+    user_first_name: str,
+    user_last_name: str,
+    books: list[str],
+    borrow_date: datetime,
+    expected_return_date: datetime,
+    ticket_id: int,
+    all_tickets_url: str,
+) -> None:
+    """
+    Sends a borrowing notification to a Telegram chat.
+
+    Parameters:
+    - user_first_name (str): The first name of the user borrowing.
+    - user_last_name (str): The last name of the user borrowing.
+    - books (List[str]): A list of books borrowed.
+    - borrow_date (datetime): The date when the borrowing took place.
+    - expected_return_date (datetime): The date for returning the item.
+    - ticket_id (int): The unique identifier for the borrowing order.
+    - all_tickets_url (str): The base URL for viewing all borrowing orders.
+    """
+    ticket_url = all_tickets_url + str(ticket_id) + "/"
+
+    context = f"<b>{user_first_name} {user_last_name}</b> borrowed"
+    if books:
+        book_list = "\n  ●  ".join(books)
+        book_plural = "books" if len(books) > 1 else "book"
+        context += f" {len(books)} {book_plural}:\n\n  " f"●  {book_list}\n"
+    else:
+        context += " no books.\n"
+
+    context += (
+        f"\n<b>Borrow date:</b><code> "
+        f"{borrow_date.strftime('%d.%m.%Y')}</code>\n"
+        f"<b>Expected return date:</b><code> "
+        f"{expected_return_date.strftime('%d.%m.%Y')}</code>\n"
+        f"\nCreated<a href='{ticket_url}'> order {ticket_id}.</a>"
+    )
+
+    keyboard = __create_keyboard(ticket_url, all_tickets_url)
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
@@ -74,6 +89,16 @@ def payment_notification(
     ticket_id: int,
     all_tickets_url: str,
 ) -> None:
+    """
+    Sends a payment notification to a Telegram chat.
+
+    Parameters:
+    - user_first_name (str): The first name of the user making the payment.
+    - user_last_name (str): The last name of the user making the payment.
+    - amount (float): The amount paid by the user.
+    - ticket_id (int): The unique identifier for the payment order.
+    - all_tickets_url (str): The base URL for viewing all payment orders.
+    """
     ticket_url = all_tickets_url + str(ticket_id) + "/"
 
     context = (
@@ -81,16 +106,7 @@ def payment_notification(
         f"for<a href='{ticket_url}'> order {ticket_id}</a>."
     )
 
-    keyboard = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
-                InlineKeyboardButton(
-                    text="🎟️ ALL ORDERS", url=all_tickets_url
-                ),
-            ],
-        ]
-    )
+    keyboard = __create_keyboard(ticket_url, all_tickets_url)
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
@@ -99,22 +115,3 @@ def payment_notification(
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )
-
-
-# borrowing_notification(
-#     user_first_name="Dmytro",
-#     user_last_name="Petrykiv",
-#     books=["Clean Code", "Mein Kampf", "How i find your mom"],
-#     borrow_date=datetime.date(2023, 12, 14),
-#     expected_return_date=datetime.date(2023, 12, 21),
-#     ticket_id=1,
-#     all_tickets_url="https://chat.openai.com/",
-# )
-#
-# payment_notification(
-#     user_first_name="Dmytro",
-#     user_last_name="Petrykiv",
-#     amount=14.99,
-#     ticket_id=1,
-#     all_tickets_url="https://chat.openai.com/",
-# )
