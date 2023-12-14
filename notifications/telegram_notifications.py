@@ -19,7 +19,7 @@ PAYMENT_PHOTO = (
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
 
-def create_keyboard(ticket_url: str, all_tickets_url: str):
+def __create_keyboard(ticket_url: str, all_tickets_url: str):
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -71,7 +71,7 @@ def borrowing_notification(
         f"\nCreated<a href='{ticket_url}'> order {ticket_id}.</a>"
     )
 
-    keyboard = create_keyboard(ticket_url, all_tickets_url)
+    keyboard = __create_keyboard(ticket_url, all_tickets_url)
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
@@ -106,7 +106,7 @@ def payment_notification(
         f"for<a href='{ticket_url}'> order {ticket_id}</a>."
     )
 
-    keyboard = create_keyboard(ticket_url, all_tickets_url)
+    keyboard = __create_keyboard(ticket_url, all_tickets_url)
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
