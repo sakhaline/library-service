@@ -9,6 +9,6 @@ class BorrowingListView(generics.ListAPIView):
     serializer_class = BorrowingSerializer
 
 
-class BorrowDetailSerializer(generics.RetrieveAPIView):
+class BorrowingDetailView(generics.RetrieveAPIView):
     queryset = Borrowing.objects.all()
     serializer_class = BorrowingSerializer
