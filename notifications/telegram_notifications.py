@@ -19,13 +19,15 @@ PAYMENT_PHOTO = (
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
 
-def borrowing_notification(user_first_name: str,
-                           user_last_name: str,
-                           books: list[str],
-                           borrow_date: datetime,
-                           expected_return_date: datetime,
-                           ticket_id: int,
-                           all_tickets_url: str, ) -> None:
+def borrowing_notification(
+    user_first_name: str,
+    user_last_name: str,
+    books: list[str],
+    borrow_date: datetime,
+    expected_return_date: datetime,
+    ticket_id: int,
+    all_tickets_url: str,
+) -> None:
     ticket_url = all_tickets_url + str(ticket_id) + "/"
 
     context = f"<b>{user_first_name} {user_last_name}</b> borrowed"
@@ -48,10 +50,10 @@ def borrowing_notification(user_first_name: str,
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="🎫 THIS ORDER",
-                                     url=ticket_url),
-                InlineKeyboardButton(text="🎟️ ALL ORDERS",
-                                     url=all_tickets_url),
+                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
+                InlineKeyboardButton(
+                    text="🎟️ ALL ORDERS", url=all_tickets_url
+                ),
             ],
         ]
     )
@@ -65,11 +67,13 @@ def borrowing_notification(user_first_name: str,
     )
 
 
-def payment_notification(user_first_name: str,
-                         user_last_name: str,
-                         amount: float,
-                         ticket_id: int,
-                         all_tickets_url: str, ) -> None:
+def payment_notification(
+    user_first_name: str,
+    user_last_name: str,
+    amount: float,
+    ticket_id: int,
+    all_tickets_url: str,
+) -> None:
     ticket_url = all_tickets_url + str(ticket_id) + "/"
 
     context = (
@@ -80,10 +84,10 @@ def payment_notification(user_first_name: str,
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text="🎫 THIS ORDER",
-                                     url=ticket_url),
-                InlineKeyboardButton(text="🎟️ ALL ORDERS",
-                                     url=all_tickets_url),
+                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
+                InlineKeyboardButton(
+                    text="🎟️ ALL ORDERS", url=all_tickets_url
+                ),
             ],
         ]
     )
@@ -95,6 +99,7 @@ def payment_notification(user_first_name: str,
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )
+
 
 # borrowing_notification(
 #     user_first_name="Dmytro",
