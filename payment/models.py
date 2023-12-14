@@ -13,9 +13,9 @@ class Payment(models.Model):
         PAYMENT = "P", _("Payment")
         FINE = "F", _("Fine")
 
-    status = EnumField(StatusChoices, default=StatusChoices.PENDING)
-    type = EnumField(TypeChoices, default=TypeChoices.PAYMENT)
+    status = EnumField(StatusChoices, max_length=16, default=StatusChoices.PENDING)
+    type = EnumField(TypeChoices, max_length=16, default=TypeChoices.PAYMENT)
     borrowing_id = models.IntegerField()
     session_url = models.CharField(max_length=255)
     session_id = models.CharField(max_length=255)
-    money_to_pay = models.DecimalField()
+    money_to_pay = models.DecimalField(decimal_places=2, max_digits=10000)
