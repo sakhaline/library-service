@@ -16,6 +16,8 @@ class BookViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
     GenericViewSet,
 ):
     queryset = Book.objects.all()
