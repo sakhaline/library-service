@@ -72,8 +72,7 @@ def borrowing_notification(
         f"{borrow.borrow_date.strftime('%d.%m.%Y')}</code>\n"
         f"<b>Expected return date:</b><code> "
         f"{borrow.expected_return_date.strftime('%d.%m.%Y')}</code>\n"
-        f"\n <b>Price: </b><code>{borrow.rent_fee}$</code>"
-        f"\nCreated<a href='{ticket_url}'> order {borrow.id}.</a>"
+        f"\n<b>Price: </b><code>{borrow.rent_fee}$</code>"
     )
 
     keyboard = __create_keyboard(ticket_url, all_tickets_url)
