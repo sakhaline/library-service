@@ -1,14 +1,16 @@
-from rest_framework import generics
+from rest_framework import viewsets
 
 from borrowing.models import Borrowing
 from borrowing.serializers import BorrowingSerializer
 
 
-class BorrowingListView(generics.ListAPIView):
-    queryset = Borrowing.objects.all()
+class BorrowingViewSet(viewsets.ModelViewSet):
+    queryset = Borrowing.objects.prefetch_related("books")
     serializer_class = BorrowingSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user.id)
 
-class BorrowingDetailView(generics.RetrieveAPIView):
-    queryset = Borrowing.objects.all()
-    serializer_class = BorrowingSerializer
+    def get_queryset(self):
+        queryset = self.queryset.filter(user=self.request.user.id)
+        return queryset

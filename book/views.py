@@ -11,7 +11,7 @@ from book.serializers import (
 )
 
 
-class BookListViewSet(
+class BookViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,

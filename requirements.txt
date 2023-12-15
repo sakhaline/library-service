@@ -19,3 +19,4 @@ pep8-naming==0.13.3
 python-telegram-bot==13.15
 stripe==7.8.2
 django-enumfields==2.1.1
+psycopg2-binary==2.9.9
