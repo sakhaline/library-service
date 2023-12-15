@@ -6,7 +6,7 @@ from service_config import settings
 from payment.models import Payment
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-API_URL = "http/locahost:8000"
+API_URL = "http/127.0.0.1:8000"
 FINE_MULTIPLIER = 2
 
 
@@ -37,7 +37,8 @@ def create_payment_session(borrowing, days: int = None):
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": f"{borrowing.book.title} borrowing for {days} days",
+                            "name": f"{borrowing.book.title} borrowing "
+                                    f"for {days} days",
                         },
                         "unit_amount": amount,
                     },
