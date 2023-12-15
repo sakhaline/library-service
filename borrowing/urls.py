@@ -7,8 +7,8 @@ from borrowing.views import (
 
 
 urlpatterns = [
-    path("borrowings/", BorrowingListView.as_view(), name="borrowing-list"),
-    path("borrowings/<int:pk>/", BorrowingDetailView.as_view(), name="borrowing-detail"),
+    path("", BorrowingListView.as_view(), name="borrowing-list"),
+    path("<int:pk>/", BorrowingDetailView.as_view(), name="borrowing-detail"),
 ]
 
 app_name = "borrowing"
