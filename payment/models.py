@@ -25,4 +25,4 @@ class Payment(models.Model):
     )
     session_url = models.CharField(max_length=255)
     session_id = models.CharField(max_length=255)
-    money_to_pay = models.DecimalField(decimal_places=2, max_digits=10000)
+    money_to_pay = models.DecimalField(max_digits=3, decimal_places=2)
