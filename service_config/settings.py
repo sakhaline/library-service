@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -113,3 +114,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "user.User"
+
+STRIPE_SECRET_KEY = os.environ["STRIPE_SECRET_KEY"]
