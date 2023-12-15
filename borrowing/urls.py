@@ -10,7 +10,12 @@ router.register("borrowings", BorrowingViewSet)
 
 
 urlpatterns = [
-    path("", include(router.urls))
+    path("", include(router.urls)),
+    path(
+        "<int:pk>/return",
+        BorrowingViewSet.as_view({"post": "return_book"}),
+        name="return",
+    ),
 ]
 
 app_name = "borrowing"
