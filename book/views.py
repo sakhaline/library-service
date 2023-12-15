@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from book.models import Book
+from book.permissions import IsAdminOrIfAuthenticatedReadOnly
 from book.serializers import (
     BookListSerializer,
     BookDetailSerializer,
@@ -19,6 +20,7 @@ class BookViewSet(
 ):
     queryset = Book.objects.all()
     serializer_class = BookListSerializer
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @staticmethod
     def _params_to_ints(qs):
