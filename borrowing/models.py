@@ -11,5 +11,15 @@ class Borrowing(models.Model):
     books = models.ManyToManyField(Book, related_name="borrowings")
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="borrowings")
 
+    @property
+    def rent_fee(self):
+        total_price = 0
+        for book in self.books.all():
+            duration = self.expected_return_date - self.borrow_date
+            book_price = book.daily_fee * duration.days
+            total_price += book_price
+
+        return total_price
+
     def __str__(self) -> str:
         return f"{self.user} on: {self.borrow_date.date()} {[book.title for book in self.books.all()]}"
