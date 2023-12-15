@@ -1,11 +1,9 @@
-import datetime
 import os
 
 import telegram
-from django.contrib.auth import get_user_model
-from django.db.migrations import serializer
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
+from django.contrib.auth import get_user_model
 from borrowing.models import Borrowing
 from user.models import User
 
