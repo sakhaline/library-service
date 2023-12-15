@@ -55,6 +55,19 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
         model = Borrowing
         fields = ("borrow_date", "expected_return_date", "books", )
 
+    def create(self, validated_data):
+        books_data = validated_data.pop("books")
+        borrowing = Borrowing.objects.create(**validated_data)
+        print(f"==================={borrowing}")
+        for book_data in books_data:
+            book = book_data
+            print(f"==============={book.inventory}")
+            if book.inventory:
+                book.inventory -= 1
+            book.save()
+            print(f"======================={book.inventory}")
+        return borrowing
+
     # def create(self, validated_data):
     #     return Borrowing.objects.create(**validated_data)
     #

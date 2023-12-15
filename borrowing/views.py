@@ -34,12 +34,12 @@ class BorrowingViewSet(viewsets.ModelViewSet):
                 id__in={**self.request.data}.get("books")
             ).values_list("title", flat=True)
         )
-        borrowing_notification(
-            user=self.request.user,
-            borrow=serializer.instance,
-            books_names=book_titles_list,
-            all_tickets_url="http://127.0.0.1:8000/api/borrowings/borrowings/",
-        )
+        # borrowing_notification(
+        #     user=self.request.user,
+        #     borrow=serializer.instance,
+        #     books_names=book_titles_list,
+        #     all_tickets_url="http://127.0.0.1:8000/api/borrowings/borrowings/",
+        # )
 
     def list(self, request, *args, **kwargs):
         is_active = self.request.query_params.get("is_active", None)
