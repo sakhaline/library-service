@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,7 +11,7 @@ from book.serializers import (
 )
 
 
-class BookListViewSet(
+class BookViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
