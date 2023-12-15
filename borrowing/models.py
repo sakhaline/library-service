@@ -8,5 +8,8 @@ class Borrowing(models.Model):
     borrow_date = models.DateTimeField(auto_now_add=True)
     expected_return_date = models.DateTimeField()
     actual_return_date = models.DateTimeField(blank=True, null=True)
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    books = models.ManyToManyField(Book, related_name="borrowings")
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="borrowings")
+
+    def __str__(self) -> str:
+        return f"{self.user} on: {self.borrow_date.date()} {[book.title for book in self.books.all()]}"
