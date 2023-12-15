@@ -43,6 +43,15 @@ def borrowing_notification(
     books_names: list[str],
     all_tickets_url: str,
 ) -> None:
+    """
+    Send a borrowing notification to a user on Telegram.
+
+    Args:
+        user (User): The user who borrowed the books.
+        borrow (Borrowing): The borrowing instance representing the order.
+        books_names (list): A list of book names borrowed.
+        all_tickets_url (str): The URL for the page containing all orders.
+    """
     if user.first_name and user.last_name:
         name = f"{user.first_name} {user.last_name}"
     else:
