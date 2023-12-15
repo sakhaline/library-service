@@ -43,7 +43,7 @@ def borrowing_notification(
     books_names: list[str],
     all_tickets_url: str,
 ) -> None:
-    if f"{user.first_name} {user.last_name}" != "":
+    if user.first_name and user.last_name:
         name = f"{user.first_name} {user.last_name}"
     else:
         name = user.email
@@ -85,7 +85,7 @@ def payment_notification(
     ticket_id: int,
     all_tickets_url: str,
 ) -> None:
-    if f"{user.first_name} {user.last_name}" != "":
+    if user.first_name and user.last_name:
         name = f"{user.first_name} {user.last_name}"
     else:
         name = user.email
