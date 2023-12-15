@@ -1,5 +1,4 @@
 from django.contrib import admin
+from borrowing.models import Borrowing
 
-from payment.models import Payment
-
-admin.site.register(Payment)
+admin.site.register(Borrowing)
