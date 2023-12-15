@@ -1,8 +1,11 @@
-import datetime
 import os
 
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
+
+from django.contrib.auth import get_user_model
+from borrowing.models import Borrowing
+from user.models import User
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
@@ -33,42 +36,44 @@ def __create_keyboard(ticket_url: str, all_tickets_url: str):
 
 
 def borrowing_notification(
-    user_first_name: str,
-    user_last_name: str,
-    books: list[str],
-    borrow_date: datetime,
-    expected_return_date: datetime,
-    ticket_id: int,
+    user: get_user_model(),
+    borrow: Borrowing,
+    books_names: list[str],
     all_tickets_url: str,
 ) -> None:
     """
-    Sends a borrowing notification to a Telegram chat.
+    Send a borrowing notification to a user on Telegram.
 
-    Parameters:
-    - user_first_name (str): The first name of the user borrowing.
-    - user_last_name (str): The last name of the user borrowing.
-    - books (List[str]): A list of books borrowed.
-    - borrow_date (datetime): The date when the borrowing took place.
-    - expected_return_date (datetime): The date for returning the item.
-    - ticket_id (int): The unique identifier for the borrowing order.
-    - all_tickets_url (str): The base URL for viewing all borrowing orders.
+    Args:
+        user (User): The user who borrowed the books.
+        borrow (Borrowing): The borrowing instance representing the order.
+        books_names (list): A list of book names borrowed.
+        all_tickets_url (str): The URL for the page containing all orders.
     """
-    ticket_url = all_tickets_url + str(ticket_id) + "/"
+    if user.first_name and user.last_name:
+        name = f"{user.first_name} {user.last_name}"
+    else:
+        name = user.email
 
-    context = f"<b>{user_first_name} {user_last_name}</b> borrowed"
-    if books:
-        book_list = "\n  ●  ".join(books)
-        book_plural = "books" if len(books) > 1 else "book"
-        context += f" {len(books)} {book_plural}:\n\n  " f"●  {book_list}\n"
+    ticket_url = f"{all_tickets_url}{borrow.id}/"
+
+    context = f"<b>{name}</b> borrowed"
+    if books_names:
+        book_list = "\n  ●  ".join(books_names)
+        book_plural = "books" if len(books_names) > 1 else "book"
+        context += (
+            f" {len(books_names)} {book_plural}:\n\n  " f"●  {book_list}\n"
+        )
     else:
         context += " no books.\n"
 
     context += (
         f"\n<b>Borrow date:</b><code> "
-        f"{borrow_date.strftime('%d.%m.%Y')}</code>\n"
+        f"{borrow.borrow_date.strftime('%d.%m.%Y')}</code>\n"
         f"<b>Expected return date:</b><code> "
-        f"{expected_return_date.strftime('%d.%m.%Y')}</code>\n"
-        f"\nCreated<a href='{ticket_url}'> order {ticket_id}.</a>"
+        f"{borrow.expected_return_date.strftime('%d.%m.%Y')}</code>\n"
+        f"\n <b>Price: </b><code>{borrow.rent_fee}$</code>"
+        f"\nCreated<a href='{ticket_url}'> order {borrow.id}.</a>"
     )
 
     keyboard = __create_keyboard(ticket_url, all_tickets_url)
@@ -83,26 +88,20 @@ def borrowing_notification(
 
 
 def payment_notification(
-    user_first_name: str,
-    user_last_name: str,
+    user: User,
     amount: float,
     ticket_id: int,
     all_tickets_url: str,
 ) -> None:
-    """
-    Sends a payment notification to a Telegram chat.
+    if user.first_name and user.last_name:
+        name = f"{user.first_name} {user.last_name}"
+    else:
+        name = user.email
 
-    Parameters:
-    - user_first_name (str): The first name of the user making the payment.
-    - user_last_name (str): The last name of the user making the payment.
-    - amount (float): The amount paid by the user.
-    - ticket_id (int): The unique identifier for the payment order.
-    - all_tickets_url (str): The base URL for viewing all payment orders.
-    """
     ticket_url = all_tickets_url + str(ticket_id) + "/"
 
     context = (
-        f"<b>{user_first_name} {user_last_name}</b> payed {amount}$ "
+        f"<b>{name}</b> payed {amount}$ "
         f"for<a href='{ticket_url}'> order {ticket_id}</a>."
     )
 
