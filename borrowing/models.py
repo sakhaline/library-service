@@ -1,12 +1,22 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 
 from book.models import Book
 
 
+def future_date_validator(value):
+    if value <= timezone.now():
+        raise ValidationError("Expected return date should be in the future.")
+
+    if value <= timezone.now() + timezone.timedelta(days=1):
+        raise ValidationError("Minimum borrowing term is one day.")
+
+
 class Borrowing(models.Model):
     borrow_date = models.DateTimeField(auto_now_add=True)
-    expected_return_date = models.DateTimeField()
+    expected_return_date = models.DateTimeField(validators=[future_date_validator])
     actual_return_date = models.DateTimeField(blank=True, null=True)
     books = models.ManyToManyField(Book, related_name="borrowings")
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="borrowings")
