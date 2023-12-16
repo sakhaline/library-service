@@ -34,7 +34,7 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
                 borrowing.books.add(book)
                 book.save()
             else:
-                raise ValidationError({"books": "Some of books are out of inventory."})
+                raise ValidationError({"errors": f" Book {book.title} has no copies"})
         return borrowing
 
 
