@@ -69,3 +69,15 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This book has already been "
                                               "returned.")
         return attrs
+
+    @transaction.atomic()
+    def update(self, instance, validated_data):
+        actual_return_date = validated_data.get("actual_return_date")
+        books = instance.books.all()
+        print(books)
+        for book in books:
+            book.inventory += 1
+            book.save()
+        instance.actual_return_date = actual_return_date
+        instance.save()
+        return instance
