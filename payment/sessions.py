@@ -4,9 +4,10 @@ from django.urls import reverse
 from decimal import Decimal
 from service_config import settings
 from payment.models import Payment
+from service_config.settings import BASE_URL
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-API_URL = "http://127.0.0.1:8000"
+
 FINE_MULTIPLIER = 2
 
 
@@ -47,9 +48,9 @@ def create_payment_session(borrowing, days: int = None):
                 }
             ],
             mode="payment",
-            success_url=f"{API_URL}{reverse('payment:success')}"
+            success_url=f"{BASE_URL}{reverse('payment:success')}"
                         + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=f"{API_URL}{reverse('payment:cancel')}"
+            cancel_url=f"{BASE_URL}{reverse('payment:cancel')}"
                        + "?session_id={CHECKOUT_SESSION_ID}",
         )
         create_payment(borrowing, session, payment_type)
