@@ -1,6 +1,11 @@
+from django.db import transaction
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
+from book.models import Book
+from book.serializers import BookListSerializer
 from borrowing.models import Borrowing
+from user.serializers import UserSerializer
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -11,16 +16,41 @@ class BorrowingSerializer(serializers.ModelSerializer):
         model = Borrowing
         fields = ("id", "user", "borrow_date", "expected_return_date", "books", "rent_fee", )
 
+
+class BorrowingCreateSerializer(serializers.ModelSerializer):
+    books = serializers.PrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
+
+    class Meta:
+        model = Borrowing
+        fields = ("expected_return_date", "books", )
+
+    @transaction.atomic()
     def create(self, validated_data):
-        return Borrowing.objects.create(**validated_data)
+        books = validated_data.pop("books")
+        borrowing = Borrowing.objects.create(**validated_data)
+        for book in books:
+            if book.inventory:
+                book.inventory -= 1
+                borrowing.books.add(book)
+                book.save()
+            else:
+                raise ValidationError({"books": "Some of books are out of inventory."})
+        return borrowing
 
-    def update(self, instance, validated_data):
-        instance.expected_return_date = validated_data.get("expected_return_date", instance.expected_return_date)
-        instance.actual_return_date = validated_data.get("actual_return_date", instance.actual_return_date)
-        instance.books = validated_data.get("books", instance.book)
-        instance.save()
 
-        return instance
+class BorrowingUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Borrowing
+        fields = ("expected_return_date", "books", "actual_return_date", )
+
+
+class BorrowingDetailSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True, many=False)
+    books = BookListSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Borrowing
+        fields = ("borrow_date", "expected_return_date", "actual_return_date", "books", "user", )
 
 
 class BorrowingReturnSerializer(serializers.ModelSerializer):
@@ -39,43 +69,3 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This book has already been "
                                               "returned.")
         return attrs
-
- 
-class BorrowingListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Borrowing
-        fields = ("id", "user", "borrow_date", "expected_return_date", "actual_return_date", "books", "rent_fee", )
-
-
-class BorrowingDetailSerializer(serializers.ModelSerializer):
-    # user = serializers.CharField(source="user.email", read_only=False)
-    # books = serializers.IntegerField(source="book.id", read_only=False)
-
-    class Meta:
-        model = Borrowing
-        fields = ("borrow_date", "expected_return_date", "books", )
-
-    def create(self, validated_data):
-        books_data = validated_data.pop("books")
-        borrowing = Borrowing.objects.create(**validated_data)
-        print(f"==================={borrowing}")
-        for book_data in books_data:
-            book = book_data
-            print(f"==============={book.inventory}")
-            if book.inventory:
-                book.inventory -= 1
-            book.save()
-            print(f"======================={book.inventory}")
-        return borrowing
-
-    # def create(self, validated_data):
-    #     return Borrowing.objects.create(**validated_data)
-    #
-    # def update(self, instance, validated_data):
-    #     instance.expected_return_date = validated_data.get("expected_return_date", instance.expected_return_date)
-    #     instance.actual_return_date = validated_data.get("actual_return_date", instance.actual_return_date)
-    #     instance.books = validated_data.get("books", instance.book)
-    #     instance.user = validated_data.get("user", instance.user)
-    #     instance.save()
-    #
-    #     return instance
