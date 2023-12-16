@@ -29,11 +29,14 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        print(serializer.instance.rent_fee)
         book_titles_list = list(
             Book.objects.filter(
                 id__in={**self.request.data}.get("books")
             ).values_list("title", flat=True)
+        )
+        create_payment_session(
+            borrowing=serializer.instance,
+            book_titles_list=book_titles_list,
         )
         borrowing_notification(
             user=self.request.user,
@@ -67,7 +70,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return queryset
      
     def get_serializer_class(self):
-        print(self.action)
 
         if self.action == "create":
             return BorrowingCreateSerializer
@@ -104,7 +106,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             books.inventory += 1
             books.save()
             serializer.save()
-            response_serializer = BorrowingSerializer(borrowing)
+            response_serializer = BorrowingDetailSerializer(borrowing)
             # change  BorrowingSerializer -> BorrowingDetailSerializer
             return Response(response_serializer.data,
                             status=status.HTTP_200_OK)
