@@ -33,7 +33,7 @@ def create_payment_session(borrowing, book_titles_list, days: int = None):
     #     borrowing.rent_fee borrowing.rent_fee * Decimal(100)
     payment_type = "Payment"
     print(borrowing.rent_fee * Decimal(100))
-
+    amount = int(Decimal(borrowing.rent_fee) * Decimal(100))
     try:
         session = stripe.checkout.Session.create(
             line_items=[
@@ -43,7 +43,7 @@ def create_payment_session(borrowing, book_titles_list, days: int = None):
                         "product_data": {
                             "name": "Borrowed books",
                         },
-                        "unit_amount": 10.00,
+                        "unit_amount": amount,
                     },
                     "quantity": 1,
                 }
@@ -56,34 +56,5 @@ def create_payment_session(borrowing, book_titles_list, days: int = None):
         create_payment(borrowing, session, payment_type)
         return session
     except Exception as e:
+        print(e)
         return {"error": str(e)}
-
-    # try:
-    #     print("START SESSION")
-    #     session = stripe.checkout.Session.create(
-    #         line_items=[
-    #             {
-    #                 "price_data": {
-    #                     "currency": "usd",
-    #                     "product_data": {
-    #                         "name": f" borrowing",
-    #                     },
-    #                     "unit_amount": 1, 2,
-    #                 },
-    #                 "quantity": 1,
-    #             }
-    #         ],
-    #         mode="payment",
-    #         success_url=f"{API_URL}{reverse('payment:success')}"
-    #         + "?session_id={CHECKOUT_SESSION_ID}",
-    #         cancel_url=f"{API_URL}{reverse('payment:cancel')}"
-    #         + "?session_id={CHECKOUT_SESSION_ID}",
-    #     )
-    #     print(session)
-    #     print("SESSION")
-    #     create_payment(borrowing, session, payment_type)
-    #     print(session)
-    #     return session
-    # except Exception as e:
-    #     print("EXEPTION")
-    #     return {"error": str(e)}
