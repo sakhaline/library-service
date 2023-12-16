@@ -1,10 +1,12 @@
 import os
 
 import telegram
+from django.urls import reverse
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 from django.contrib.auth import get_user_model
 from borrowing.models import Borrowing
+from service_config.settings import BASE_URL
 from user.models import User
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
@@ -39,22 +41,21 @@ def borrowing_notification(
     user: get_user_model(),
     borrow: Borrowing,
     books_names: list[str],
-    all_tickets_url: str,
 ) -> None:
     """
-    Send a borrowing notification to a user on Telegram.
+    Send a borrowing notification to Telegram.
 
     Args:
         user (User): The user who borrowed the books.
         borrow (Borrowing): The borrowing instance representing the order.
         books_names (list): A list of book names borrowed.
-        all_tickets_url (str): The URL for the page containing all orders.
     """
     if user.first_name and user.last_name:
         name = f"{user.first_name} {user.last_name}"
     else:
         name = user.email
 
+    all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
     ticket_url = f"{all_tickets_url}{borrow.id}/"
 
     context = f"<b>{name}</b> borrowed"
@@ -88,20 +89,26 @@ def borrowing_notification(
 
 def payment_notification(
     user: User,
-    amount: float,
-    ticket_id: int,
-    all_tickets_url: str,
+    borrow: Borrowing,
 ) -> None:
+    """
+    Send a notification to Telegram if payment was successful.
+
+    Args:
+        user (User): The user who borrowed the books.
+        borrow (Borrowing): The borrowing instance representing the order.
+    """
+    all_tickets_url = f"{BASE_URL}{reverse('payment:payment-list')}"
     if user.first_name and user.last_name:
         name = f"{user.first_name} {user.last_name}"
     else:
         name = user.email
 
-    ticket_url = all_tickets_url + str(ticket_id) + "/"
+    ticket_url = f"{all_tickets_url}{borrow.id}/"
 
     context = (
-        f"<b>{name}</b> payed {amount}$ "
-        f"for<a href='{ticket_url}'> order {ticket_id}</a>."
+        f"<b>{name}</b> payed {borrow.rent_fee}$ rent "
+        f"for<a href='{ticket_url}'> order {borrow.id}</a>."
     )
 
     keyboard = __create_keyboard(ticket_url, all_tickets_url)
