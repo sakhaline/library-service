@@ -4,12 +4,14 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
+from notifications.telegram_notifications import payment_notification
 from service_config import settings
 from payment.models import Payment
 from payment.serializers import (
     PaymentSerializer,
     PaymentDetailSerializer,
-    PaymentListSerializer
+    PaymentListSerializer,
 )
 
 
@@ -20,7 +22,7 @@ class PaymentViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    GenericViewSet
+    GenericViewSet,
 ):
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
@@ -54,11 +56,15 @@ class PaymentViewSet(
             if not payment.session_url:
                 return Response(
                     {"detail": "Payment does not have a valid session_url"},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
 
             session = stripe.checkout.Session.retrieve(payment.session_id)
-            if session.payment_status == 'paid':
+            if session.payment_status == "paid":
+                payment_notification(
+                    user=payment.borrowing_id.user,
+                    borrow=payment.borrowing_id,
+                )
                 payment.status = Payment.StatusChoices.PAID
                 payment.save()
 
@@ -67,17 +73,17 @@ class PaymentViewSet(
             else:
                 return Response(
                     {"detail": "Payment not succeeded"},
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
         except stripe.error.StripeError as e:
             return Response(
                 {"detail": f"Stripe error: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         except Exception as e:
             return Response(
                 {"detail": f"An unexpected error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
     @action(
@@ -91,15 +97,17 @@ class PaymentViewSet(
         try:
             refund = stripe.Refund.create(payment_intent=payment.session_id)
 
-            if refund.status == 'succeeded':
+            if refund.status == "succeeded":
                 payment.status = Payment.StatusChoices.PENDING
                 payment.save()
 
                 serializer = self.get_serializer(payment)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
-                return Response({"detail": "Refund not succeeded"},
-                                status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {"detail": "Refund not succeeded"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         except stripe.error.StripeError as e:
             return Response(
@@ -109,5 +117,5 @@ class PaymentViewSet(
         except Exception as e:
             return Response(
                 {"detail": f"An unexpected error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
