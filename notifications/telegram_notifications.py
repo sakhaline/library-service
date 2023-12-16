@@ -2,6 +2,8 @@ import os
 
 import telegram
 from django.urls import reverse
+from rest_framework import status, serializers
+from rest_framework.response import Response
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
 from django.contrib.auth import get_user_model
@@ -85,6 +87,39 @@ def borrowing_notification(
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )
+    if user.telegram_chat_id:
+        try:
+            BOT.sendPhoto(
+                chat_id=user.telegram_chat_id,
+                photo=BORROW_PHOTO,
+                caption=context,
+                parse_mode=ParseMode.HTML,
+                reply_markup=keyboard,
+            )
+        except telegram.error.Unauthorized:
+            error = {
+                "Error message": "Your notifications are not working! "
+                "Chat not initialized!",
+                "Borrowings List": f"{all_tickets_url}",
+            }
+            raise serializers.ValidationError(error)
+
+        except telegram.error.BadRequest:
+            user.telegram_chat_id = ""
+            user.save()
+            error = {
+                "Error message": "Your notifications are not working! The "
+                "Chat ID is not correct and was removed!",
+                "Borrowings List": f"{all_tickets_url}",
+            }
+            raise serializers.ValidationError(error)
+
+        except Exception as e:
+            error = {
+                "Error message": e,
+                "Borrowings List": f"{all_tickets_url}",
+            }
+            raise serializers.ValidationError(error)
 
 
 def payment_notification(
