@@ -31,5 +31,15 @@ class Borrowing(models.Model):
 
         return total_price
 
+    @property
+    def over_rent_fee(self):
+        total_price = 0
+        for book in self.books.all():
+            duration = self.actual_return_date - self.expected_return_date
+            book_price = book.daily_fee * duration.days
+            total_price += book_price
+
+        return total_price
+
     def __str__(self) -> str:
         return f"{self.user} on: {self.borrow_date.date()} {[book.title for book in self.books.all()]}"
