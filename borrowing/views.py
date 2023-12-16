@@ -1,4 +1,3 @@
-import datetime
 from django.utils import timezone
 
 from django.db import transaction
@@ -30,9 +29,9 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
         book_titles_list = list(
-            Book.objects.filter(
-                id__in={**self.request.data}.get("books")
-            ).values_list("title", flat=True)
+            Book.objects.filter(id__in={**self.request.data}.get("books")).values_list(
+                "title", flat=True
+            )
         )
         create_payment_session(
             borrowing=serializer.instance,
@@ -67,9 +66,8 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         else:
             queryset = self.queryset.filter(user=self.request.user)
         return queryset
-     
-    def get_serializer_class(self):
 
+    def get_serializer_class(self):
         if self.action == "create":
             return BorrowingCreateSerializer
 
@@ -93,19 +91,32 @@ class BorrowingViewSet(viewsets.ModelViewSet):
                 borrowing, data=request.data, partial=True
             )
             serializer.is_valid(raise_exception=True)
+
+            if borrowing.actual_return_date:
+                return Response(
+                    {"error": "These books has already been returned."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
             borrowing.actual_return_date = timezone.now()
             borrowing.save()
+
             if borrowing.actual_return_date > borrowing.expected_return_date:
                 days = (
-                        borrowing.actual_return_date.date()
-                        - borrowing.expected_return_date.date()
+                    borrowing.actual_return_date.date()
+                    - borrowing.expected_return_date.date()
                 ).days
                 create_payment_session(borrowing, days)
-            books = borrowing.books
-            books.inventory += 1
-            books.save()
+
+            books = borrowing.books.all()
+            for book in books:
+                book.inventory += 1
+                book.save()
+
             serializer.save()
             response_serializer = BorrowingDetailSerializer(borrowing)
-            # change  BorrowingSerializer -> BorrowingDetailSerializer
-            return Response(response_serializer.data,
-                            status=status.HTTP_200_OK)
+            data = {
+                "message": "Books returned successfully.",
+                "borrowing_details": response_serializer.data,
+            }
+            return Response(data, status=status.HTTP_200_OK)

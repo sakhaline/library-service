@@ -5,7 +5,6 @@ from rest_framework.exceptions import ValidationError
 from book.models import Book
 from book.serializers import BookListSerializer
 from borrowing.models import Borrowing
-from payment.sessions import create_payment_session
 from user.serializers import UserSerializer
 
 
@@ -15,7 +14,14 @@ class BorrowingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("id", "user", "borrow_date", "expected_return_date", "books", "rent_fee", )
+        fields = (
+            "id",
+            "user",
+            "borrow_date",
+            "expected_return_date",
+            "books",
+            "rent_fee",
+        )
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):
@@ -23,7 +29,10 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("expected_return_date", "books", )
+        fields = (
+            "expected_return_date",
+            "books",
+        )
 
     @transaction.atomic()
     def create(self, validated_data):
@@ -42,7 +51,11 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 class BorrowingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
-        fields = ("expected_return_date", "books", "actual_return_date", )
+        fields = (
+            "expected_return_date",
+            "books",
+            "actual_return_date",
+        )
 
 
 class BorrowingDetailSerializer(serializers.ModelSerializer):
@@ -51,10 +64,18 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("borrow_date", "expected_return_date", "actual_return_date", "books", "user", )
+        fields = (
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "books",
+            "user",
+        )
 
 
 class BorrowingReturnSerializer(serializers.ModelSerializer):
+    books = BookListSerializer(read_only=True, many=True)
+
     class Meta:
         model = Borrowing
         fields = (
@@ -64,9 +85,3 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
             "actual_return_date",
             "books",
         )
-
-    def validate(self, attrs):
-        if self.instance.actual_return_date is not None:
-            raise serializers.ValidationError("This book has already been "
-                                              "returned.")
-        return attrs
