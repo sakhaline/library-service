@@ -13,6 +13,8 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
 ]
 
+BASE_URL = os.environ["BASE_URL"]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
