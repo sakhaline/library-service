@@ -4,20 +4,44 @@ from django.utils.translation import gettext as _
 
 
 class UserSerializer(serializers.ModelSerializer):
+    chat_initialized = serializers.BooleanField(
+        write_only=True, required=False
+    )
+
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "password", "is_staff")
+        fields = (
+            "id",
+            "email",
+            "password",
+            "telegram_chat_id",
+            "is_staff",
+            "chat_initialized",
+        )
         read_only_fields = ("is_staff",)
-        extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
+        extra_kwargs = {
+            "password": {
+                "write_only": True,
+                "min_length": 5,
+                "required": False,
+            }
+        }
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
+        telegram_chat_id = validated_data.pop("telegram_chat_id", None)
+        chat_initialized = validated_data.pop("chat_initialized", None)
         user = super().update(instance, validated_data)
+
         if password:
             user.set_password(password)
+            user.save()
+
+        if telegram_chat_id and chat_initialized:
+            user.telegram_chat_id = telegram_chat_id
             user.save()
 
         return user

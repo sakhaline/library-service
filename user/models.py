@@ -35,7 +35,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
-
+    telegram_chat_id = models.CharField(max_length=150, blank=True, null=True)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
