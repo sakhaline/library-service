@@ -26,41 +26,22 @@ PAYMENT_PHOTO = (
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
 
-def __create_keyboard(ticket_url: str, all_tickets_url: str):
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
-                InlineKeyboardButton(
-                    text="🎟️ ALL ORDERS", url=all_tickets_url
-                ),
-            ],
-        ]
-    )
-
-
 def borrowing_notification(
     user: get_user_model(),
     borrow: Borrowing,
     books_names: list[str],
+    payment_url: str = "https://www.python.org/",
 ) -> None:
-    """
-    Send a borrowing notification to Telegram.
-
-    Args:
-        user (User): The user who borrowed the books.
-        borrow (Borrowing): The borrowing instance representing the order.
-        books_names (list): A list of book names borrowed.
-    """
-    if user.first_name and user.last_name:
-        name = f"{user.first_name} {user.last_name}"
-    else:
-        name = user.email
+    name = (
+        f"{user.first_name} {user.last_name}"
+        if user.first_name and user.last_name
+        else user.email
+    )
 
     all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
     ticket_url = f"{all_tickets_url}{borrow.id}/"
 
-    context = f"<b>{name}</b> borrowed"
+    context = f" borrowed"
     if books_names:
         book_list = "\n  ●  ".join(books_names)
         book_plural = "books" if len(books_names) > 1 else "book"
@@ -78,12 +59,22 @@ def borrowing_notification(
         f"\n<b>Price: </b><code>{borrow.rent_fee}$</code>"
     )
 
-    keyboard = __create_keyboard(ticket_url, all_tickets_url)
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🎫 THIS ORDER", url=ticket_url),
+                InlineKeyboardButton(
+                    text="🎟️ ALL ORDERS", url=all_tickets_url
+                ),
+                InlineKeyboardButton(text="💰️ PAY ORDER", url=payment_url),
+            ],
+        ]
+    )
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
         photo=BORROW_PHOTO,
-        caption=context,
+        caption=f"<b>{name}</b>" + context,
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )
@@ -92,7 +83,7 @@ def borrowing_notification(
             BOT.sendPhoto(
                 chat_id=user.telegram_chat_id,
                 photo=BORROW_PHOTO,
-                caption=context,
+                caption="<b>You</b>" + context,
                 parse_mode=ParseMode.HTML,
                 reply_markup=keyboard,
             )
@@ -126,32 +117,75 @@ def payment_notification(
     user: User,
     borrow: Borrowing,
 ) -> None:
-    """
-    Send a notification to Telegram if payment was successful.
-
-    Args:
-        user (User): The user who borrowed the books.
-        borrow (Borrowing): The borrowing instance representing the order.
-    """
-    all_tickets_url = f"{BASE_URL}{reverse('payment:payment-list')}"
-    if user.first_name and user.last_name:
-        name = f"{user.first_name} {user.last_name}"
-    else:
-        name = user.email
-
-    ticket_url = f"{all_tickets_url}{borrow.id}/"
-
-    context = (
-        f"<b>{name}</b> payed {borrow.rent_fee}$ rent "
-        f"for<a href='{ticket_url}'> order {borrow.id}</a>."
+    name = (
+        f"{user.first_name} {user.last_name}"
+        if user.first_name and user.last_name
+        else user.email
     )
 
-    keyboard = __create_keyboard(ticket_url, all_tickets_url)
+    all_payment_url = f"{BASE_URL}{reverse('payment:payment-list')}"
+    payment_url = f"{all_payment_url}{borrow.id}/"
+
+    return_book_url = (
+        f"{BASE_URL}{reverse('borrowing:return', args=[borrow.pk])}"
+    )
+
+    context = (
+        f"\nPayed:  <code>{borrow.rent_fee}$</code>"
+        f"\nFor order:  <a href='{payment_url}'><code>{borrow.id}</code></a>"
+    )
+
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="🎫 THIS ORDER", url=payment_url),
+                InlineKeyboardButton(
+                    text="🎟️ ALL ORDERS", url=all_payment_url
+                ),
+                InlineKeyboardButton(
+                    text="📚️ RETURN BOOKS", url=return_book_url
+                ),
+            ],
+        ]
+    )
 
     BOT.sendPhoto(
         chat_id=TELEGRAM_CHAT_ID,
-        photo=PAYMENT_PHOTO,
-        caption=context,
+        photo=BORROW_PHOTO,
+        caption=f"<b>{name}</b>" + context,
         parse_mode=ParseMode.HTML,
         reply_markup=keyboard,
     )
+    if user.telegram_chat_id:
+        try:
+            BOT.sendPhoto(
+                chat_id=user.telegram_chat_id,
+                photo=BORROW_PHOTO,
+                caption="<b>You</b>" + context,
+                parse_mode=ParseMode.HTML,
+                reply_markup=keyboard,
+            )
+        except telegram.error.Unauthorized:
+            error = {
+                "Error message": "Your notifications are not working! "
+                "Chat not initialized!",
+                "Borrowings List": f"{all_payment_url}",
+            }
+            raise serializers.ValidationError(error)
+
+        except telegram.error.BadRequest:
+            user.telegram_chat_id = ""
+            user.save()
+            error = {
+                "Error message": "Your notifications are not working! The "
+                "Chat ID is not correct and was removed!",
+                "Borrowings List": f"{all_payment_url}",
+            }
+            raise serializers.ValidationError(error)
+
+        except Exception as e:
+            error = {
+                "Error message": e,
+                "Borrowings List": f"{all_payment_url}",
+            }
+            raise serializers.ValidationError(error)
