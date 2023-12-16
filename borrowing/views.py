@@ -67,6 +67,7 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         return queryset
 
     def get_serializer_class(self):
+        print(self.action)
         if self.action == "create":
             return BorrowingCreateSerializer
 
@@ -75,6 +76,9 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         if self.action == "update":
             return BorrowingUpdateSerializer
+
+        if self.action == "return_book":
+            return BorrowingReturnSerializer
 
         return BorrowingSerializer
 
