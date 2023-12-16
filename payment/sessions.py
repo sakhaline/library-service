@@ -22,6 +22,7 @@ def create_payment(borrowing, session, payment_type):
     print("CREATED PAYMENT")
 
 
+
 def create_payment_session(borrowing, days: int = None):
     if days:
         amount = (int(Decimal(borrowing.over_rent_fee) * Decimal(100)) *
@@ -54,4 +55,5 @@ def create_payment_session(borrowing, days: int = None):
         create_payment(borrowing, session, payment_type)
         return session
     except Exception as e:
+        print(e)
         return {"error": str(e)}
