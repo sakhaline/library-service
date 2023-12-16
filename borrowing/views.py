@@ -36,7 +36,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         )
         create_payment_session(
             borrowing=serializer.instance,
-            book_titles_list=book_titles_list,
         )
         borrowing_notification(
             user=self.request.user,

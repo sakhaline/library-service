@@ -6,7 +6,7 @@ from service_config import settings
 from payment.models import Payment
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-API_URL = "http/127.0.0.1:8000"
+API_URL = "http://127.0.0.1:8000"
 FINE_MULTIPLIER = 2
 
 
@@ -22,18 +22,16 @@ def create_payment(borrowing, session, payment_type):
     print("CREATED PAYMENT")
 
 
-def create_payment_session(borrowing, book_titles_list, days: int = None):
-    print("START")
-    # if days:
-    #     amount = int(borrowing.rent_fee) * days * 100 * FINE_MULTIPLIER
-    #     payment_type = "Fine"
-    # else:
-    #     days = (borrowing.expected_return_date - borrowing.borrow_date).days
-    #     amount = int(borrowing.books.daily_fee) * days * 100
-    #     borrowing.rent_fee borrowing.rent_fee * Decimal(100)
-    payment_type = "Payment"
-    print(borrowing.rent_fee * Decimal(100))
-    amount = int(Decimal(borrowing.rent_fee) * Decimal(100))
+
+def create_payment_session(borrowing, days: int = None):
+    if days:
+        amount = (int(Decimal(borrowing.over_rent_fee) * Decimal(100)) *
+                  FINE_MULTIPLIER)
+        payment_type = "Fine"
+    else:
+        amount = int(Decimal(borrowing.rent_fee) * Decimal(100))
+        payment_type = "Payment"
+
     try:
         session = stripe.checkout.Session.create(
             line_items=[
@@ -49,10 +47,11 @@ def create_payment_session(borrowing, book_titles_list, days: int = None):
                 }
             ],
             mode="payment",
-            success_url="https://example.com/success?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url="https://example.com/cancel?session_id={CHECKOUT_SESSION_ID}",
+            success_url=f"{API_URL}{reverse('payment:success')}"
+                        + "?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=f"{API_URL}{reverse('payment:cancel')}"
+                       + "?session_id={CHECKOUT_SESSION_ID}",
         )
-        print(session)
         create_payment(borrowing, session, payment_type)
         return session
     except Exception as e:
