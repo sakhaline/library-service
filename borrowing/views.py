@@ -41,7 +41,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             user=self.request.user,
             borrow=serializer.instance,
             books_names=book_titles_list,
-            all_tickets_url="http://127.0.0.1:8000/api/borrowings/borrowings/",
         )
 
     def list(self, request, *args, **kwargs):
