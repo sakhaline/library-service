@@ -28,6 +28,9 @@ def update_payment(payment_instance, session):
 
 
 def create_payment_session(borrowing, days: int = None):
+    books = [book.title for book in borrowing.books.all()]
+    #print(books)
+
     if days:
         amount = (
             int(Decimal(borrowing.over_rent_fee) * Decimal(100))
@@ -49,7 +52,7 @@ def create_payment_session(borrowing, days: int = None):
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": "Borrowed books",
+                            "name": ", ".join(books),
                         },
                         "unit_amount": amount,
                     },

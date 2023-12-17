@@ -1,5 +1,6 @@
 import stripe
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -26,6 +27,7 @@ class PaymentViewSet(
 ):
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = self.queryset
@@ -98,29 +100,22 @@ class PaymentViewSet(
     )
     def cancel(self, request, pk=None):
         payment = get_object_or_404(Payment, pk=pk)
+        session = stripe.checkout.Session.retrieve(payment.session_id)
 
-        try:
-            refund = stripe.Refund.create(payment_intent=payment.session_id)
-
-            if refund.status == "succeeded":
-                payment.status = Payment.StatusChoices.PENDING
-                payment.save()
-
-                serializer = self.get_serializer(payment)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(
-                    {"detail": "Refund not succeeded"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-        except stripe.error.StripeError as e:
+        if (session.payment_status == "unpaid" and payment.status ==
+                Payment.StatusChoices.PENDING):
             return Response(
-                {"detail": f"Stripe error: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {
+                    "detail": "Payment can be paid a bit later (but the "
+                              "session is available for only 24h)",
+                    "payment_link": f"{payment.session_url}"
+                 },
+                status=status.HTTP_200_OK,
             )
-        except Exception as e:
+        else:
             return Response(
-                {"detail": f"An unexpected error occurred: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {
+                    "detail": "Payment was succeed",
+                },
+                status=status.HTTP_200_OK,
             )
