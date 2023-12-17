@@ -65,7 +65,7 @@ class PaymentViewSet(
                 and payment.status != Payment.StatusChoices.PAID
             ):
                 payment_notification(
-                    user=payment.borrowing_id.user,
+
                     borrow=payment.borrowing_id,
                 )
                 payment.status = Payment.StatusChoices.PAID
