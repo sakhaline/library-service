@@ -30,7 +30,6 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             borrowing=serializer.instance,
         )
         borrowing_notification(
-            user=self.request.user,
             borrow=serializer.instance,
             payment_url=session.url,
         )
