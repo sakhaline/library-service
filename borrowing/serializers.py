@@ -5,7 +5,15 @@ from rest_framework.exceptions import ValidationError
 from book.models import Book
 from book.serializers import BookListSerializer
 from borrowing.models import Borrowing
+from payment.models import Payment
+from payment.serializers import PaymentSerializer
 from user.serializers import UserSerializer
+
+
+class BorrowingPaymentSerializer(PaymentSerializer):
+    class Meta:
+        model = Payment
+        fields = ("id", "status", "payment_type", "borrowing_id", "money_to_pay", )
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -13,6 +21,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
         many=True, read_only=True, slug_field="title"
     )
     user = serializers.CharField(source="user.email", read_only=True)
+    payments = BorrowingPaymentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Borrowing
@@ -23,6 +32,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "expected_return_date",
             "books",
             "rent_fee",
+            "payments",
         )
 
 
