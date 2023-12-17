@@ -65,7 +65,6 @@ class PaymentViewSet(
                 and payment.status != Payment.StatusChoices.PAID
             ):
                 payment_notification(
-
                     borrow=payment.borrowing_id,
                 )
                 payment.status = Payment.StatusChoices.PAID
@@ -131,7 +130,9 @@ class PaymentViewSet(
         methods=["GET"],
         detail=True,
         url_path="refund",
-        permission_classes=[IsAdminUser,]
+        permission_classes=[
+            IsAdminUser,
+        ],
     )
     def refund(self, request, pk=None):
         payment = get_object_or_404(Payment, pk=pk)
@@ -167,3 +168,12 @@ class PaymentViewSet(
                     {"detail": f"An unexpected error occurred: {str(e)}"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
+        else:
+            return Response(
+                {
+                    "detail": "Your payment intent is not defined "
+                    "(You don't make any payments)",
+                    "payment": payment.session_id,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )

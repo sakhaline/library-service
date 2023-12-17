@@ -69,3 +69,43 @@ PAYMENT_PHOTO = ("link-to-image")
 #### 🎄 Now you will get new notification to your Telegram !
 
 </details>
+
+## Stripe Payment System 💳
+
+Stripe is a widely used payment processing platform that enables businesses 
+and individuals to accept online payments. 
+Stripe offers a RESTful API that allows developers to interact with various resources,
+such as customers, payments, subscriptions, and more.
+* Stripe API: https://stripe.com/docs/api
+
+### Bellow we can see how the payment session looks like:
+![payment](https://github.com/sakhaline/library-service/assets/61559978/ad279349-31ab-4f3d-b8eb-d44c886cc3fe)
+
+
+### Payment Endpoints:
+
+1. GET /api/payment
+* Description: Retrieve all payments for an authenticated user.
+
+2. GET /api/payment/pk/
+* Description: Retrieve detailed information about a specific payment.
+
+3. GET /api/payment/pk/success/
+* Description: Check the success status of a Stripe payment by examining the 
+   payment status.
+
+4. GET /api/payment/pk/cancel/
+* Description: Return a payment paused message, allowing the user's payment 
+   link to be available for 24 hours.
+
+5. GET /api/payment/pk/refund/
+
+* Description: Admins Only - Refund money to a user in case of unexpected 
+issues. Accessible to users with is_staff = True.
+
+### You can test how the payment session works using these test card credentials 💳:
+* Email: `doe@gmail.com`
+* Cardholder name: `Joe Doe` 
+* Card Number: `4242 4242 4242 4242`
+* Date MM/YY: `11/30` (random feature date)
+* CVC: `123`
