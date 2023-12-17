@@ -16,10 +16,14 @@ def future_date_validator(value):
 
 class Borrowing(models.Model):
     borrow_date = models.DateTimeField(auto_now_add=True)
-    expected_return_date = models.DateTimeField(validators=[future_date_validator])
+    expected_return_date = models.DateTimeField(
+        validators=[future_date_validator]
+    )
     actual_return_date = models.DateTimeField(blank=True, null=True)
     books = models.ManyToManyField(Book, related_name="borrowings")
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="borrowings")
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="borrowings"
+    )
 
     @property
     def rent_fee(self):
@@ -42,4 +46,5 @@ class Borrowing(models.Model):
         return total_price
 
     def __str__(self) -> str:
-        return f"{self.user} on: {self.borrow_date.date()} {[book.title for book in self.books.all()]}"
+        return (f"{self.user} on: {self.borrow_date.date()} "
+                f"{[book.title for book in self.books.all()]}")
