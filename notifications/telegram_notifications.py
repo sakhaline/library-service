@@ -12,10 +12,10 @@ from service_config.settings import BASE_URL
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-BORROW_PHOTO = "https://i.ibb.co/FhgwH3s/Borrowing.png"
-PAYMENT_PHOTO = "https://i.ibb.co/pvQKBcL/PAYMENT.jpg"
-OVERDUE_PHOTO = "https://i.ibb.co/pvQKBcL/PAYMENT.jpg"
-NO_OVERDUE_PHOTO = "https://i.ibb.co/pvQKBcL/PAYMENT.jpg"
+BORROW_PHOTO = os.environ["BORROW_PHOTO"]
+PAYMENT_PHOTO = os.environ["PAYMENT_PHOTO"]
+OVERDUE_PHOTO = os.environ["OVERDUE_PHOTO"]
+NO_OVERDUE_PHOTO = os.environ["NO_OVERDUE_PHOTO"]
 
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
