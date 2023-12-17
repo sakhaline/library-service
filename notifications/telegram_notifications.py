@@ -116,12 +116,11 @@ def send_notification(user, photo, context, keyboard, back_url):
 def borrowing_notification(
     user: get_user_model(),
     borrow: Borrowing,
-    books_names: list[str],
-    payment_url: str = "https://www.python.org/",
+    payment_url: str,
 ) -> None:
     all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
     ticket_url = f"{all_tickets_url}{borrow.id}/"
-
+    books_names = [book.title for book in borrow.books.all()]
     context = " borrowed"
     if books_names:
         book_list = "\n  ●  ".join(books_names)

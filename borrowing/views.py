@@ -7,9 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from book.models import Book
 from borrowing.models import Borrowing
-
 from payment.sessions import create_payment_session
 from borrowing.serializers import (
     BorrowingSerializer,
@@ -28,18 +26,13 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-        book_titles_list = list(
-            Book.objects.filter(
-                id__in={**self.request.data}.get("books")
-            ).values_list("title", flat=True)
-        )
-        create_payment_session(
+        session = create_payment_session(
             borrowing=serializer.instance,
         )
         borrowing_notification(
             user=self.request.user,
             borrow=serializer.instance,
-            books_names=book_titles_list,
+            payment_url=session.url,
         )
 
     def list(self, request, *args, **kwargs):
