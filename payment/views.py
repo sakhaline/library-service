@@ -1,6 +1,6 @@
 import stripe
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins, status
 from rest_framework.decorators import action
@@ -33,9 +33,7 @@ class PaymentViewSet(
         queryset = self.queryset
 
         if not self.request.user.is_staff:
-            queryset = queryset.filter(
-                borrowing_id__user_id=self.request.user.id
-            )
+            queryset = queryset.filter(borrowing_id__user_id=self.request.user.id)
 
         return queryset.distinct()
 
@@ -62,8 +60,10 @@ class PaymentViewSet(
                 )
 
             session = stripe.checkout.Session.retrieve(payment.session_id)
-            if (session.payment_status == "paid" and payment.status !=
-                    Payment.StatusChoices.PAID):
+            if (
+                session.payment_status == "paid"
+                and payment.status != Payment.StatusChoices.PAID
+            ):
                 payment_notification(
                     user=payment.borrowing_id.user,
                     borrow=payment.borrowing_id,
@@ -73,10 +73,14 @@ class PaymentViewSet(
 
                 serializer = self.get_serializer(payment)
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            elif (session.payment_status == "paid" and payment.status ==
-                    Payment.StatusChoices.PAID):
-                return Response({"detail": "Payment already successful!"},
-                                status=status.HTTP_400_BAD_REQUEST,)
+            elif (
+                session.payment_status == "paid"
+                and payment.status == Payment.StatusChoices.PAID
+            ):
+                return Response(
+                    {"detail": "Payment already successful!"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             else:
                 return Response(
                     {"detail": "Payment not succeeded!"},
@@ -102,20 +106,64 @@ class PaymentViewSet(
         payment = get_object_or_404(Payment, pk=pk)
         session = stripe.checkout.Session.retrieve(payment.session_id)
 
-        if (session.payment_status == "unpaid" and payment.status ==
-                Payment.StatusChoices.PENDING):
+        if (
+            session.payment_status == "unpaid"
+            and payment.status == Payment.StatusChoices.PENDING
+        ):
             return Response(
                 {
                     "detail": "Payment can be paid a bit later (but the "
-                              "session is available for only 24h)",
-                    "payment_link": f"{payment.session_url}"
-                 },
+                    "session is available for only 24h)",
+                    "payment_link": f"{payment.session_url}",
+                },
                 status=status.HTTP_200_OK,
             )
         else:
             return Response(
                 {
-                    "detail": "Payment was succeed",
+                    "session_id": session.id,
+                    "detail": "Payment has already completed",
                 },
                 status=status.HTTP_200_OK,
             )
+
+    @action(
+        methods=["GET"],
+        detail=True,
+        url_path="refund",
+        permission_classes=[IsAdminUser,]
+    )
+    def refund(self, request, pk=None):
+        payment = get_object_or_404(Payment, pk=pk)
+        session = stripe.checkout.Session.retrieve(payment.session_id)
+
+        if (
+            session.payment_status == "paid"
+            and payment.status == Payment.StatusChoices.PAID
+        ):
+            try:
+                payment_intent = session["payment_intent"]
+                refund = stripe.Refund.create(payment_intent=payment_intent)
+
+                if refund.status == "succeeded":
+                    payment.status = Payment.StatusChoices.PENDING
+                    payment.save()
+
+                    serializer = self.get_serializer(payment)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {"detail": "Refund not succeeded"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+            except stripe.error.StripeError as e:
+                return Response(
+                    {"detail": f"Stripe error: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
+            except Exception as e:
+                return Response(
+                    {"detail": f"An unexpected error occurred: {str(e)}"},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                )
