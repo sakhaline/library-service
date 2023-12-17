@@ -162,7 +162,7 @@ def payment_notification(
 
     context = (
         f"\nPayed:  <code>{borrow.rent_fee}$</code>"
-        f"\nFor order:  <code>{borrow.id}</code></a>"
+        f"\nFor order:  <code>{borrow.id}</code>"
     )
 
     send_notification(
