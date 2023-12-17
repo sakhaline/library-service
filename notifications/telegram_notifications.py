@@ -5,16 +5,17 @@ from django.urls import reverse
 from rest_framework import serializers
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ParseMode
 
-from django.contrib.auth import get_user_model
 from borrowing.models import Borrowing
 from service_config.settings import BASE_URL
-from user.models import User
+
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-BORROW_PHOTO = "https://i.ibb.co/FhgwH3s/Borrowing.png"
-PAYMENT_PHOTO = "https://i.ibb.co/pvQKBcL/PAYMENT.jpg"
+BORROW_PHOTO = os.environ["BORROW_PHOTO"]
+PAYMENT_PHOTO = os.environ["PAYMENT_PHOTO"]
+OVERDUE_PHOTO = os.environ["OVERDUE_PHOTO"]
+NO_OVERDUE_PHOTO = os.environ["NO_OVERDUE_PHOTO"]
 
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
@@ -114,14 +115,13 @@ def send_notification(user, photo, context, keyboard, back_url):
 
 
 def borrowing_notification(
-    user: get_user_model(),
     borrow: Borrowing,
-    books_names: list[str],
-    payment_url: str = "https://www.python.org/",
+    payment_url: str,
 ) -> None:
+    user = borrow.user
     all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
     ticket_url = f"{all_tickets_url}{borrow.id}/"
-
+    books_names = [book.title for book in borrow.books.all()]
     context = " borrowed"
     if books_names:
         book_list = "\n  ●  ".join(books_names)
@@ -155,15 +155,15 @@ def borrowing_notification(
 
 
 def payment_notification(
-    user: User,
     borrow: Borrowing,
 ) -> None:
+    user = borrow.user
     all_payment_url = f"{BASE_URL}{reverse('payment:payment-list')}"
     payment_url = f"{all_payment_url}{borrow.id}/"
 
     context = (
         f"\nPayed:  <code>{borrow.rent_fee}$</code>"
-        f"\nFor order:  <code>{borrow.id}</code></a>"
+        f"\nFor order:  <code>{borrow.id}</code>"
     )
 
     send_notification(
@@ -176,4 +176,55 @@ def payment_notification(
             borrow_id=borrow.pk,
         ),
         back_url=all_payment_url,
+    )
+
+
+def send_overdue_notification(
+    borrow: Borrowing,
+) -> None:
+    print("1")
+    user = borrow.user
+    all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
+    ticket_url = f"{all_tickets_url}{borrow.id}/"
+    books_names = [book.title for book in borrow.books.all()]
+    book_list = "\n  ●  ".join(books_names)
+    book_plural = (
+        "books is overdue" if len(books_names) > 1 else "book is overdue"
+    )
+    context = (
+        f" {len(books_names)} {book_plural}:\n\n  "
+        f"●  {book_list}\n "
+        f"\n<b>Expected return date:</b><code> "
+        f"{borrow.expected_return_date.strftime('%d.%m.%Y')}</code>\n"
+    )
+    send_notification(
+        user=user,
+        photo=OVERDUE_PHOTO,
+        context=context,
+        keyboard=create_keyboard(
+            single_url=ticket_url,
+            multiple_url=all_tickets_url,
+            borrow_id=borrow.pk,
+        ),
+        back_url=all_tickets_url,
+    )
+
+
+def send_no_overdue_notification() -> None:
+    all_tickets_url = f"{BASE_URL}{reverse('borrowing:borrowing-list')}"
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="🎟️ ALL ORDERS", url=all_tickets_url
+                ),
+            ],
+        ]
+    )
+    BOT.sendPhoto(
+        chat_id=TELEGRAM_CHAT_ID,
+        photo=NO_OVERDUE_PHOTO,
+        caption="\n<code>No borrowings are overdue today!</code>\n",
+        parse_mode=ParseMode.HTML,
+        reply_markup=keyboard,
     )

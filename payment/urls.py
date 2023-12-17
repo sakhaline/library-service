@@ -19,6 +19,11 @@ urlpatterns = [
         PaymentViewSet.as_view({"get": "cancel"}),
         name="cancel",
     ),
+    path(
+        "<int:pk>/refund/",
+        PaymentViewSet.as_view({"get": "refund"}),
+        name="refund"
+    )
 ]
 
 app_name = "payment"
