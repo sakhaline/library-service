@@ -9,20 +9,34 @@ from user.serializers import UserSerializer
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
-    books = serializers.SlugRelatedField(many=True, read_only=True, slug_field="title")
+    books = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="title"
+    )
     user = serializers.CharField(source="user.email", read_only=True)
 
     class Meta:
         model = Borrowing
-        fields = ("id", "user", "borrow_date", "expected_return_date", "books", "rent_fee", )
+        fields = (
+            "id",
+            "user",
+            "borrow_date",
+            "expected_return_date",
+            "books",
+            "rent_fee",
+        )
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):
-    books = serializers.PrimaryKeyRelatedField(many=True, queryset=Book.objects.all())
+    books = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Book.objects.all()
+    )
 
     class Meta:
         model = Borrowing
-        fields = ("expected_return_date", "books", )
+        fields = (
+            "expected_return_date",
+            "books",
+        )
 
     @transaction.atomic()
     def create(self, validated_data):
@@ -34,14 +48,20 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
                 borrowing.books.add(book)
                 book.save()
             else:
-                raise ValidationError({"errors": f" Book {book.title} has no copies"})
+                raise ValidationError(
+                    {"books": "Some of books are out of inventory."}
+                )
         return borrowing
 
 
 class BorrowingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
-        fields = ("expected_return_date", "books", "actual_return_date", )
+        fields = (
+            "expected_return_date",
+            "books",
+            "actual_return_date",
+        )
 
 
 class BorrowingDetailSerializer(serializers.ModelSerializer):
@@ -50,34 +70,24 @@ class BorrowingDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("borrow_date", "expected_return_date", "actual_return_date", "books", "user", )
+        fields = (
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+            "books",
+            "user",
+        )
 
 
 class BorrowingReturnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
-        fields = (
+        exclude = (
             "id",
             "borrow_date",
             "expected_return_date",
             "actual_return_date",
             "books",
+            "user",
         )
-
-    def validate(self, attrs):
-        if self.instance.actual_return_date is not None:
-            raise serializers.ValidationError("This book has already been "
-                                              "returned.")
-        return attrs
-
-    @transaction.atomic()
-    def update(self, instance, validated_data):
-        actual_return_date = validated_data.get("actual_return_date")
-        books = instance.books.all()
-        print(books)
-        for book in books:
-            book.inventory += 1
-            book.save()
-        instance.actual_return_date = actual_return_date
-        instance.save()
-        return instance
+   

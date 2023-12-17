@@ -1,44 +1,55 @@
 import stripe
 
 from django.urls import reverse
+from decimal import Decimal
 
+import payment
 from service_config import settings
 from payment.models import Payment
+from service_config.settings import BASE_URL
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
-API_URL = "http/127.0.0.1:8000"
+
 FINE_MULTIPLIER = 2
 
 
-def create_payment(borrowing, session, payment_type):
-    Payment.objects.create(
-        status="Pending",
-        payment_type=payment_type,
-        borrowing_id=borrowing,
-        session_url=session.url,
-        session_id=session.id,
-        money_to_pay=session.amount_total,
+def initialize_payment(borrowing, payment_type):
+    return Payment.objects.create(
+        borrowing_id=borrowing, payment_type=payment_type, money_to_pay=0
     )
+
+
+def update_payment(payment_instance, session):
+    payment_instance.status = Payment.StatusChoices.PENDING
+    payment_instance.session_url = session.url
+    payment_instance.session_id = session.id
+    payment_instance.money_to_pay = session.amount_total / 100
+    payment_instance.save()
 
 
 def create_payment_session(borrowing, days: int = None):
     if days:
-        amount = int(borrowing.book.daily_fee) * days * 100 * FINE_MULTIPLIER
-        payment_type = "FINE"
+        amount = (
+            int(Decimal(borrowing.over_rent_fee) * Decimal(100))
+            * FINE_MULTIPLIER
+        )
+
+        payment_type = Payment.TypeChoices.FINE
     else:
-        days = (borrowing.expected_return_date - borrowing.borrow_date).days
-        amount = int(borrowing.book.daily_fee) * days * 100
-        payment_type = "PAYMENT"
+        amount = int(Decimal(borrowing.rent_fee) * Decimal(100))
+        payment_type = Payment.TypeChoices.PAYMENT
 
     try:
+        payment_instance = initialize_payment(
+            borrowing=borrowing, payment_type=payment_type
+        )
         session = stripe.checkout.Session.create(
             line_items=[
                 {
                     "price_data": {
                         "currency": "usd",
                         "product_data": {
-                            "name": f"{borrowing.book.title} borrowing "
-                                    f"for {days} days",
+                            "name": "Borrowed books",
                         },
                         "unit_amount": amount,
                     },
@@ -46,12 +57,13 @@ def create_payment_session(borrowing, days: int = None):
                 }
             ],
             mode="payment",
-            success_url=f"{API_URL}{reverse('payment:success')}"
-            + "?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=f"{API_URL}{reverse('payment:cancel')}"
-            + "?session_id={CHECKOUT_SESSION_ID}",
+            success_url=f"{BASE_URL}"
+            f"{reverse('payment:success', args=[payment_instance.pk])}",
+            cancel_url=f"{BASE_URL}"
+            f"{reverse('payment:cancel', args=[payment_instance.pk])}",
         )
-        create_payment(borrowing, session, payment_type)
+        update_payment(payment_instance=payment_instance, session=session)
         return session
+
     except Exception as e:
         return {"error": str(e)}
