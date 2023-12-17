@@ -13,14 +13,8 @@ from user.models import User
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 TELEGRAM_CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
-BORROW_PHOTO = (
-    "https://www.englishcurrent.com/wp-content/"
-    "uploads/2021/02/borrow-money_1200-compressed.jpg"
-)
-PAYMENT_PHOTO = (
-    "https://stg-cdn-wp.themix.org.uk/"
-    "uploads/2014/03/i-need-to-borrow-some-money.jpg"
-)
+BORROW_PHOTO = "https://i.ibb.co/FhgwH3s/Borrowing.png"
+PAYMENT_PHOTO = "https://i.ibb.co/pvQKBcL/PAYMENT.jpg"
 
 BOT = telegram.Bot(TELEGRAM_API_KEY)
 
@@ -169,7 +163,7 @@ def payment_notification(
 
     context = (
         f"\nPayed:  <code>{borrow.rent_fee}$</code>"
-        f"\nFor order:  <a href='{payment_url}'><code>{borrow.id}</code></a>"
+        f"\nFor order:  <code>{borrow.id}</code></a>"
     )
 
     send_notification(
