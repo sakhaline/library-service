@@ -78,9 +78,9 @@ Stripe offers a RESTful API that allows developers to interact with various reso
 such as customers, payments, subscriptions, and more.
 * Stripe API: https://stripe.com/docs/api
 
-### Bellow we can see how payment session looks like:
+### Bellow we can see how the payment session looks like:
+![payment](https://github.com/sakhaline/library-service/assets/61559978/ad279349-31ab-4f3d-b8eb-d44c886cc3fe)
 
-![img.png](https://ibb.co/j6n4Zt9)
 
 ### Payment Endpoints:
 
@@ -103,9 +103,9 @@ such as customers, payments, subscriptions, and more.
 * Description: Admins Only - Refund money to a user in case of unexpected 
 issues. Accessible to users with is_staff = True.
 
-### You can test how payment session works using this test card credentials 💳:
+### You can test how the payment session works using these test card credentials 💳:
 * Email: `doe@gmail.com`
 * Cardholder name: `Joe Doe` 
-* Card number: `4242 4242 4242 4242`
+* Card Number: `4242 4242 4242 4242`
 * Date MM/YY: `11/30` (random feature date)
 * CVC: `123`
