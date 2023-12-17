@@ -18,7 +18,7 @@ urlpatterns = [
         "<int:pk>/cancel/",
         PaymentViewSet.as_view({"get": "cancel"}),
         name="cancel",
-    ),
+    )
 ]
 
 app_name = "payment"
