@@ -60,7 +60,8 @@ class PaymentViewSet(
                 )
 
             session = stripe.checkout.Session.retrieve(payment.session_id)
-            if session.payment_status == "paid":
+            if (session.payment_status == "paid" and payment.status !=
+                    Payment.StatusChoices.PAID):
                 payment_notification(
                     user=payment.borrowing_id.user,
                     borrow=payment.borrowing_id,
@@ -70,9 +71,13 @@ class PaymentViewSet(
 
                 serializer = self.get_serializer(payment)
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            elif (session.payment_status == "paid" and payment.status ==
+                    Payment.StatusChoices.PAID):
+                return Response({"detail": "Payment already successful!"},
+                                status=status.HTTP_400_BAD_REQUEST,)
             else:
                 return Response(
-                    {"detail": "Payment not succeeded"},
+                    {"detail": "Payment not succeeded!"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except stripe.error.StripeError as e:
