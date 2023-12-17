@@ -5,22 +5,20 @@ from borrowing.models import Borrowing
 
 class Payment(models.Model):
     class StatusChoices(models.TextChoices):
-        PENDING = 'P', _('Pending')
-        PAID = 'I', _('Paid')
+        PENDING = "P", _("Pending")
+        PAID = "I", _("Paid")
 
     class TypeChoices(models.TextChoices):
-        PAYMENT = 'P', _('Payment')
-        FINE = 'F', _('Fine')
+        PAYMENT = "P", _("Payment")
+        FINE = "F", _("Fine")
 
     status = models.CharField(
         max_length=16,
         choices=StatusChoices.choices,
-        default=StatusChoices.PENDING
+        default=StatusChoices.PENDING,
     )
     payment_type = models.CharField(
-        max_length=16,
-        choices=TypeChoices.choices,
-        default=TypeChoices.PAYMENT
+        max_length=16, choices=TypeChoices.choices, default=TypeChoices.PAYMENT
     )
     borrowing_id = models.ForeignKey(
         Borrowing, models.CASCADE, related_name="payments"
