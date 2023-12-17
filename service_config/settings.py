@@ -123,6 +123,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=2),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": False,
+    "AUTH_HEADER_NAME": "Auth",
 }
 
 LANGUAGE_CODE = "en-us"
