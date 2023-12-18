@@ -2,15 +2,14 @@ import os
 import tempfile
 from unittest import TestCase
 
-from PIL import Image
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from PIL import Image
 from rest_framework import status
-
-from book.models import Book
 from rest_framework.test import APIClient, APITestCase
 
-from book.serializers import BookListSerializer, BookDetailSerializer
+from book.models import Book
+from book.serializers import BookDetailSerializer, BookListSerializer
 
 BOOK_URL = reverse("book:book-list")
 

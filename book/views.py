@@ -5,11 +5,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from book.models import Book
 from book.permissions import IsAdminOrIfAuthenticatedReadOnly
-from book.serializers import (
-    BookListSerializer,
-    BookDetailSerializer,
-    BookImageSerializer,
-)
+from book.serializers import (BookDetailSerializer, BookImageSerializer,
+                              BookListSerializer)
 
 
 class BookViewSet(
