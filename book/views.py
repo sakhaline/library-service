@@ -23,7 +23,6 @@ class BookViewSet(
 
     @staticmethod
     def _params_to_ints(qs):
-        """Converts a list of string IDs to a list of integers"""
         return [int(str_id) for str_id in qs.split(",")]
 
     def get_serializer_class(self):
@@ -41,7 +40,6 @@ class BookViewSet(
         url_path="upload-image",
     )
     def upload_image(self, request, pk=None):
-        """Endpoint for uploading image to specific book"""
         movie = self.get_object()
         serializer = self.get_serializer(movie, data=request.data)
 

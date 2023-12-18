@@ -13,7 +13,8 @@ class Borrowing(models.Model):
     actual_return_date = models.DateTimeField(blank=True, null=True)
     books = models.ManyToManyField(to=Book, related_name="borrowings")
     user = models.ForeignKey(
-        to=get_user_model(), on_delete=models.CASCADE,
+        to=get_user_model(),
+        on_delete=models.CASCADE,
         related_name="borrowings"
     )
 

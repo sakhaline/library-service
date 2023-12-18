@@ -20,10 +20,10 @@ class BorrowingPaymentSerializer(PaymentSerializer):
 
 class BorrowingSerializer(serializers.ModelSerializer):
     books = serializers.SlugRelatedField(
-        many=True, read_only=True, slug_field="title"
+        many=True, read_only=True, slug_field="title",
     )
-    user = serializers.CharField(source="user.email", read_only=True)
-    payments = BorrowingPaymentSerializer(many=True, read_only=True)
+    user = serializers.CharField(source="user.email", read_only=True,)
+    payments = BorrowingPaymentSerializer(many=True, read_only=True,)
 
     class Meta:
         model = Borrowing
