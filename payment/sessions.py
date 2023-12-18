@@ -1,11 +1,11 @@
-import stripe
-
-from django.urls import reverse
 from decimal import Decimal
 
+import stripe
+from django.urls import reverse
+
 import payment
-from service_config import settings
 from payment.models import Payment
+from service_config import settings
 from service_config.settings import BASE_URL
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -29,7 +29,6 @@ def update_payment(payment_instance, session):
 
 def create_payment_session(borrowing, days: int = None):
     books = [book.title for book in borrowing.books.all()]
-    #print(books)
 
     if days:
         amount = (

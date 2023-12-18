@@ -1,5 +1,6 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
+
 from payment.views import PaymentViewSet
 
 router = routers.DefaultRouter()
@@ -22,8 +23,8 @@ urlpatterns = [
     path(
         "<int:pk>/refund/",
         PaymentViewSet.as_view({"get": "refund"}),
-        name="refund"
-    )
+        name="refund",
+    ),
 ]
 
 app_name = "payment"

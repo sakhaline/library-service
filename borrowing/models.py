@@ -20,9 +20,10 @@ class Borrowing(models.Model):
         validators=[future_date_validator]
     )
     actual_return_date = models.DateTimeField(blank=True, null=True)
-    books = models.ManyToManyField(Book, related_name="borrowings")
+    books = models.ManyToManyField(to=Book, related_name="borrowings")
     user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="borrowings"
+        to=get_user_model(), on_delete=models.CASCADE,
+        related_name="borrowings"
     )
 
     @property

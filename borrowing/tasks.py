@@ -3,10 +3,8 @@ from datetime import datetime, timedelta
 from celery import shared_task
 
 from borrowing.models import Borrowing
-from notifications.telegram_notifications import (
-    send_overdue_notification,
-    send_no_overdue_notification,
-)
+from notifications.telegram_notifications import (send_no_overdue_notification,
+                                                  send_overdue_notification)
 
 
 @shared_task

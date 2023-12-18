@@ -13,7 +13,9 @@ from user.serializers import UserSerializer
 class BorrowingPaymentSerializer(PaymentSerializer):
     class Meta:
         model = Payment
-        fields = ("id", "status", "payment_type", "borrowing_id", "money_to_pay", )
+        fields = (
+            "id", "status", "payment_type", "borrowing_id", "money_to_pay",
+        )
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -100,4 +102,3 @@ class BorrowingReturnSerializer(serializers.ModelSerializer):
             "books",
             "user",
         )
-   

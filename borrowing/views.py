@@ -1,22 +1,20 @@
-from django.utils import timezone
-
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets, status
+from django.utils import timezone
+from drf_spectacular.utils import OpenApiParameter, extend_schema
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from borrowing.models import Borrowing
-from payment.sessions import create_payment_session
-from borrowing.serializers import (
-    BorrowingSerializer,
-    BorrowingDetailSerializer,
-    BorrowingReturnSerializer,
-    BorrowingCreateSerializer,
-    BorrowingUpdateSerializer,
-)
+from borrowing.serializers import (BorrowingCreateSerializer,
+                                   BorrowingDetailSerializer,
+                                   BorrowingReturnSerializer,
+                                   BorrowingSerializer,
+                                   BorrowingUpdateSerializer)
 from notifications.telegram_notifications import borrowing_notification
+from payment.sessions import create_payment_session
 
 
 class BorrowingViewSet(viewsets.ModelViewSet):
@@ -34,12 +32,28 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             payment_url=session.url,
         )
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                type=int,
+                description="Filter borrowings by user ID.(ex. ?user_id=1)",
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                description="Filter active borrowings.(ex. ?is_active=True)",
+            ),
+        ]
+    )
     def list(self, request, *args, **kwargs):
         is_active = self.request.query_params.get("is_active", None)
         user_id = self.request.query_params.get("user_id", None)
 
         if is_active is not None and is_active.lower() == "true":
             queryset = self.queryset.filter(actual_return_date__isnull=True)
+        elif is_active is not None and is_active.lower() == "false":
+            queryset = self.queryset.filter(actual_return_date__isnull=False)
         else:
             queryset = self.queryset.all()
 

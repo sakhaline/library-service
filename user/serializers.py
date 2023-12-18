@@ -1,13 +1,9 @@
-from django.contrib.auth import get_user_model, authenticate
-from rest_framework import serializers
+from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext as _
+from rest_framework import serializers
 
 
 class UserSerializer(serializers.ModelSerializer):
-    chat_initialized = serializers.BooleanField(
-        write_only=True, required=False
-    )
-
     class Meta:
         model = get_user_model()
         fields = (
@@ -16,7 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "telegram_chat_id",
             "is_staff",
-            "chat_initialized",
         )
         read_only_fields = ("is_staff",)
         extra_kwargs = {
@@ -33,14 +28,13 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
         telegram_chat_id = validated_data.pop("telegram_chat_id", None)
-        chat_initialized = validated_data.pop("chat_initialized", None)
         user = super().update(instance, validated_data)
 
         if password:
             user.set_password(password)
             user.save()
 
-        if telegram_chat_id and chat_initialized:
+        if telegram_chat_id:
             user.telegram_chat_id = telegram_chat_id
             user.save()
 
