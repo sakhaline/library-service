@@ -32,9 +32,8 @@ def create_payment_session(borrowing, days: int = None):
 
     if days:
         amount = (
-                int(Decimal(borrowing.over_rent_fee)
-                * Decimal(100))
-                * FINE_MULTIPLIER
+            int(Decimal(borrowing.over_rent_fee) * Decimal(100))
+            * FINE_MULTIPLIER
         )
 
         payment_type = Payment.TypeChoices.FINE

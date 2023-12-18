@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "django_celery_beat",
+    "drf_spectacular",
 
     "book",
     "payment",
@@ -96,6 +97,9 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_SCHEMA_CLASS": (
+        "drf_spectacular.openapi.AutoSchema",
     )
 }
 
@@ -126,3 +130,15 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379"
 CELERY_TIMEZONE = "Europe/Kiev"
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Library Service API",
+    "DESCRIPTION": ("This project aims to overhaul the traditional library "
+                    "operations plagued by manual book tracking, payment "
+                    "handling in cash, and a lack of user accountability. "
+                    "By implementing an online management system, we're "
+                    "bringing the library into the digital age, making it "
+                    "more accessible and user-friendly."),
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
