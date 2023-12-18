@@ -52,10 +52,7 @@ as an example.
 
     # On Windows
     .\venv\Scripts\activate
-5. Install dependencies:
-    ````bash
-   pip install -r requirements.txt
-6. Build and run the Docker containers:
+5. Build and run the Docker containers:
     ````bash
     docker-compose up --build
 The API will be accessible at http://localhost:8000/.
