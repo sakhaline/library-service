@@ -3,7 +3,6 @@ from decimal import Decimal
 import stripe
 from django.urls import reverse
 
-import payment
 from payment.models import Payment
 from service_config import settings
 from service_config.settings import BASE_URL
