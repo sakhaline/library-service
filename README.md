@@ -270,5 +270,7 @@ _Interacts with Stripe API using the `stripe` package._
 ## Documentation
 The API is documented using the OpenAPI standard.
 Access the API documentation by running the server and navigating to http://localhost:8000/api/doc/swagger/ or http://localhost:8000/api/doc/redoc/.
+![Screenshot from 2023-12-18 16-14-21](https://github.com/sakhaline/library-service/assets/130174413/f1745152-9cd7-4beb-ba6a-594b36810fd2)
 
 ## DB Schema
+![Screenshot from 2023-12-18 16-26-48](https://github.com/sakhaline/library-service/assets/130174413/fbf8c20a-ff98-4c1c-895a-abf6fe8f08fc)
