@@ -242,12 +242,13 @@ issues. Accessible to users with is_staff = True.
 <details>
   <summary>Payment Endpoints</summary>
 
-- **GET:** `/api/payment` - Add a new borrowing (decrement inventory by 1)
-- **GET:** `/api/payment/pk/` - Get borrowings by user id and active/inactive status
-- **GET:** `/api/payment/pk/success/` - Get specific borrowing
-- **GET:** `/api/payment/pk/cancel/` - Set actual return date (increment inventory by 1)
-- **GET:** `/api/payment/pk/refund/` - Set actual return date (increment inventory by 1)
-</details>
+- **GET:** `/api/payment` - Retrieve all payments for an authenticated user.
+- **GET:** `/api/payment/pk/` - Retrieve detailed information about a specific payment.
+- **GET:** `/api/payment/pk/success/` - Check the success status of a Stripe payment by examining the 
+   payment status.
+- **GET:** `/api/payment/pk/cancel/` - Return a payment paused message, allowing the user's payment 
+   link to be available for 24 hours.
+- **GET:** `/api/payment/pk/refund/` - Admins Only - Refund money to a user in case of unexpected issues. Accessible to users with is_staff = True.
 
 #### You can test how the payment session works using these test card credentials 💳:
 * Email: `doe@gmail.com`
