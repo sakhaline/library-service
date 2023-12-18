@@ -273,4 +273,4 @@ Access the API documentation by running the server and navigating to http://loca
 ![Screenshot from 2023-12-18 16-14-21](https://github.com/sakhaline/library-service/assets/130174413/f1745152-9cd7-4beb-ba6a-594b36810fd2)
 
 ## DB Schema
-![Screenshot from 2023-12-18 16-26-48](https://github.com/sakhaline/library-service/assets/130174413/fbf8c20a-ff98-4c1c-895a-abf6fe8f08fc)
+![Screenshot from 2023-12-18 17-01-48](https://github.com/sakhaline/library-service/assets/130174413/78077451-3279-49e7-8d85-cb4b79c1a72d)
