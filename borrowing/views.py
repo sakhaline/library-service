@@ -1,6 +1,7 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -37,6 +38,8 @@ class BorrowingViewSet(viewsets.ModelViewSet):
 
         if is_active is not None and is_active.lower() == "true":
             queryset = self.queryset.filter(actual_return_date__isnull=True)
+        elif is_active is not None and is_active.lower() == "false":
+            queryset = self.queryset.filter(actual_return_date__isnull=False)
         else:
             queryset = self.queryset.all()
 
