@@ -32,6 +32,20 @@ class BorrowingViewSet(viewsets.ModelViewSet):
             payment_url=session.url,
         )
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="user_id",
+                type=int,
+                description="Filter borrowings by user ID.(ex. ?user_id=1)",
+            ),
+            OpenApiParameter(
+                name="is_active",
+                type=bool,
+                description="Filter active borrowings.(ex. ?is_active=True)",
+            ),
+        ]
+    )
     def list(self, request, *args, **kwargs):
         is_active = self.request.query_params.get("is_active", None)
         user_id = self.request.query_params.get("user_id", None)
