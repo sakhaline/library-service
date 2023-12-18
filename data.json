@@ -784,46 +784,6 @@
     }
   },
   {
-    "model": "contenttypes.contenttype",
-    "pk": 12,
-    "fields": {
-      "app_label": "user",
-      "model": "user"
-    }
-  },
-  {
-    "model": "contenttypes.contenttype",
-    "pk": 13,
-    "fields": {
-      "app_label": "book",
-      "model": "book"
-    }
-  },
-  {
-    "model": "contenttypes.contenttype",
-    "pk": 14,
-    "fields": {
-      "app_label": "payment",
-      "model": "payment"
-    }
-  },
-  {
-    "model": "contenttypes.contenttype",
-    "pk": 15,
-    "fields": {
-      "app_label": "borrowing",
-      "model": "borrowing"
-    }
-  },
-  {
-    "model": "sessions.session",
-    "pk": "46y4f2qcokltfylemrmej4omg7ubj81u",
-    "fields": {
-      "session_data": ".eJxVjMEOwiAQRP-FsyEUSGE9evcbyC4LUjWQlPbU-O-2SQ96nHlvZhMB16WEtac5TCyuYhCX344wvlI9AD-xPpqMrS7zRPJQ5Em7vDdO79vp_h0U7GVfe9DJ-EzZkXORFBNmrUc1Rgd7cInRk3Gc0GbQA7D1WisCQAsmE4jPFwIKOHg:1rFA2H:MEbmRbBOoccmz2qbOT7XFe_aNQSK8tNc-vA0kZRu7uc",
-      "expire_date": "2024-01-01T09:35:41.406Z"
-    }
-  },
-  {
     "model": "django_celery_beat.intervalschedule",
     "pk": 1,
     "fields": {
@@ -1033,8 +993,8 @@
       "password": "pbkdf2_sha256$600000$9BpMkTMANsoxrwCVkwE75p$QyO4aCju9VWkvMyKMivOsQsLzjZCyIquzGOZzrsKgY4=",
       "last_login": "2023-12-18T09:35:41.377Z",
       "is_superuser": true,
-      "first_name": "",
-      "last_name": "",
+      "first_name": "John",
+      "last_name": "Doe",
       "is_staff": true,
       "is_active": true,
       "date_joined": "2023-12-18T09:35:28.328Z",
