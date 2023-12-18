@@ -21,7 +21,7 @@ class Payment(models.Model):
         max_length=16, choices=TypeChoices.choices, default=TypeChoices.PAYMENT
     )
     borrowing_id = models.ForeignKey(
-        Borrowing, models.CASCADE, related_name="payments"
+        to=Borrowing, on_delete=models.CASCADE, related_name="payments"
     )
     session_url = models.CharField(max_length=500)
     session_id = models.CharField(max_length=255)

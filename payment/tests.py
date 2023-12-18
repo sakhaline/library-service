@@ -60,7 +60,7 @@ def detail_url(payment_id):
 
 
 class UnauthenticatedPaymentApiTests(TestCase):
-    def SetUp(self):
+    def setUp(self):
         self.client = APIClient()
 
     def test_auth_required(self):
@@ -103,8 +103,10 @@ class AuthenticatedPaymentApiTests(TestCase):
                 }
             ],
             mode="payment",
-            success_url=f"{BASE_URL}{reverse('payment:success', args=[self.payment.id])}",
-            cancel_url=f"{BASE_URL}{reverse('payment:cancel', args=[self.payment.id])}",
+            success_url=f"{BASE_URL}"
+            f"{reverse(viewname='payment:success', args=[self.payment.id])}",
+            cancel_url=f"{BASE_URL}"
+            f"{reverse('payment:cancel', args=[self.payment.id])}",
         )
 
         self.valid_session_id = self.test_session.id
@@ -198,6 +200,13 @@ class AdminPaymentApiTests(TestCase):
 
         self.payment = Payment.objects.create(**defaults)
 
+        success_url = reverse(
+            viewname="payment:success", args=[self.payment.id]
+        )
+        cancel_url = reverse(
+            viewname="payment:cancel", args=[self.payment.id]
+        )
+
         self.test_session = stripe.checkout.Session.create(
             line_items=[
                 {
@@ -212,8 +221,8 @@ class AdminPaymentApiTests(TestCase):
                 }
             ],
             mode="payment",
-            success_url=f"{BASE_URL}{reverse('payment:success', args=[self.payment.id])}",
-            cancel_url=f"{BASE_URL}{reverse('payment:cancel',args=[self.payment.id])}",
+            success_url=f"{BASE_URL}{success_url}",
+            cancel_url=f"{BASE_URL}{cancel_url}",
         )
 
         self.valid_session_id = self.test_session.id

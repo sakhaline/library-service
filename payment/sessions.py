@@ -29,12 +29,12 @@ def update_payment(payment_instance, session):
 
 def create_payment_session(borrowing, days: int = None):
     books = [book.title for book in borrowing.books.all()]
-    #print(books)
 
     if days:
         amount = (
-            int(Decimal(borrowing.over_rent_fee) * Decimal(100))
-            * FINE_MULTIPLIER
+                int(Decimal(borrowing.over_rent_fee)
+                * Decimal(100))
+                * FINE_MULTIPLIER
         )
 
         payment_type = Payment.TypeChoices.FINE
