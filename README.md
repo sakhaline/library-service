@@ -38,21 +38,8 @@ Stripe payment gateway and Telegram API.
    cd library-service-api
 2. You can open project in IDE and configure .env file using .env.sample file 
 as an example.
-3. Create a virtual environment:
-    ```bash
-   # On Linux or macOS
-    python3 -m venv venv
 
-    # On Windows
-    python -m venv venv
-4. Activate the virtual environment:
-    ````bash
-   # On Linux or macOS
-    source venv/bin/activate
-
-    # On Windows
-    .\venv\Scripts\activate
-5. Build and run the Docker containers:
+3. Build and run the Docker containers:
     ````bash
     docker-compose up --build
 The API will be accessible at http://localhost:8000/.
@@ -238,7 +225,6 @@ issues. Accessible to users with is_staff = True.
 
 <details>
   <summary>Payment Endpoints</summary>
-
 
 - **GET:** `/api/payments` - Retrieve all payments for an authenticated user.
 - **GET:** `/api/payments/pk/` - Retrieve detailed information about a 
