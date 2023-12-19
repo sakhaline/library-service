@@ -239,13 +239,20 @@ issues. Accessible to users with is_staff = True.
 <details>
   <summary>Payment Endpoints</summary>
 
-- **GET:** `/api/payment` - Retrieve all payments for an authenticated user.
-- **GET:** `/api/payment/pk/` - Retrieve detailed information about a specific payment.
-- **GET:** `/api/payment/pk/success/` - Check the success status of a Stripe payment by examining the 
+
+- **GET:** `/api/payments` - Retrieve all payments for an authenticated user.
+- **GET:** `/api/payments/pk/` - Retrieve detailed information about a 
+  specific payment.
+- **GET:** `/api/payments/pk/success/` - Description: Check the success 
+  status of a Stripe payment by examining the 
    payment status.
-- **GET:** `/api/payment/pk/cancel/` - Return a payment paused message, allowing the user's payment 
+- **GET:** `/api/payments/pk/cancel/` - Return a payment paused message, 
+  allowing the user's payment 
    link to be available for 24 hours.
-- **GET:** `/api/payment/pk/refund/` - Admins Only - Refund money to a user in case of unexpected issues. Accessible to users with is_staff = True.
+- **GET:** `/api/payments/pk/refund/` - Admins Only - Refund money to a 
+  user in case of unexpected issues. 
+Accessible to users with is_staff = True.
+</details>
 
 #### You can test how the payment session works using these test card credentials 💳:
 * Email: `doe@gmail.com`
