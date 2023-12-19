@@ -52,10 +52,7 @@ as an example.
 
     # On Windows
     .\venv\Scripts\activate
-5. Install dependencies:
-    ````bash
-   pip install -r requirements.txt
-6. Build and run the Docker containers:
+5. Build and run the Docker containers:
     ````bash
     docker-compose up --build
 The API will be accessible at http://localhost:8000/.
@@ -241,6 +238,7 @@ issues. Accessible to users with is_staff = True.
 
 <details>
   <summary>Payment Endpoints</summary>
+
 
 - **GET:** `/api/payments` - Retrieve all payments for an authenticated user.
 - **GET:** `/api/payments/pk/` - Retrieve detailed information about a 
